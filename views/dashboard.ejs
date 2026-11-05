@@ -1,0 +1,72 @@
+<%- include('partials/header', { title, active }) %>
+<% const pengelola = user.peran === 'Pengelola'; %>
+<section class="content">
+  <div class="page-title">
+    <h1>Dashboard</h1>
+    <p>Saldo awal dashboard · <%= f.bulanID(f.todayISO().slice(0,7)) %></p>
+  </div>
+
+  <div class="summary">
+    <div class="card"><span>Bahan terdaftar</span><strong><%= total %></strong><small>bahan</small></div>
+    <div class="card bahaya"><span>Perlu dipesan</span><strong><%= perlu.length %></strong><small>bahan</small></div>
+    <div class="card aman"><span>Stok aman</span><strong><%= aman %></strong><small>bahan</small></div>
+  </div>
+
+  <div class="split">
+    <div class="split-main">
+      <div class="list-title">
+        <h2>Persediaan bahan baku</h2>
+        <p><%= daftar.length %> bahan · satuan pakai<% if (q) { %> · hasil untuk “<%= q %>”<% } %></p>
+      </div>
+
+      <% if (!daftar.length) { %>
+        <div class="empty">
+          <%- icon('inbox', 32) %>
+          <h3>Data tidak ditemukan</h3>
+          <p>Ubah kata kunci pencarian bahan.</p>
+        </div>
+      <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Bahan baku</th><th>Kategori</th><th>Saldo tersedia</th><th>Minimum stok</th><th>Status</th></tr></thead>
+          <tbody>
+          <% daftar.forEach(b => { %>
+            <tr>
+              <td data-label="Bahan baku"><div class="ident"><strong><%= b.nama %></strong><small><%= b.kode %></small></div></td>
+              <td data-label="Kategori"><%= b.kategori %></td>
+              <td data-label="Saldo tersedia"><span class="saldo <%= perluPesan(b) ? 'bahaya' : '' %>"><%= f.angka(b.saldo) %> <%= b.satuanPakai %></span></td>
+              <td data-label="Minimum stok"><%= f.angka(b.minimum) %> <%= b.satuanPakai %></td>
+              <td data-label="Status"><%- include('partials/status', { b }) %></td>
+            </tr>
+          <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } %>
+    </div>
+
+    <aside class="split-side">
+      <% if (perlu.length) { %>
+      <div class="alert err">
+        <%- icon('circle-alert', 20) %>
+        <div>
+          <strong><%= perlu.length %> bahan perlu dipesan ulang</strong>
+          <p><%= perlu.map(b => `${b.nama} tersisa ${f.angka(b.saldo)} ${b.satuanPakai}, minimum ${f.angka(b.minimum)} ${b.satuanPakai}`).join('. ') %>.<% if (!pengelola) { %> Segera hubungi Pengelola.<% } %></p>
+        </div>
+      </div>
+      <% } %>
+
+      <div class="quick">
+        <small class="eyebrow gold">PENCATATAN HARIAN</small>
+        <h3>Catat tanpa terlewat.</h3>
+        <p>Pilih bahan, isi jumlah, lalu simpan.</p>
+        <a class="btn primary block" href="/stok-keluar">Catat Stok Keluar&nbsp; →</a>
+        <a class="btn light block" href="/stok-masuk">Catat Stok Masuk&nbsp; →</a>
+        <small>Saldo diperbarui setelah disimpan.</small>
+      </div>
+    </aside>
+  </div>
+
+  <p class="footnote">Minimum dinilai per bahan dalam satuan pakai. Saldo berbeda satuan tidak dijumlahkan.</p>
+</section>
+<%- include('partials/footer') %>

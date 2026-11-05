@@ -1,0 +1,60 @@
+<%- include('partials/header', { title, active }) %>
+<section class="content">
+  <div class="page-title">
+    <h1>Laporan &amp; Riwayat Transaksi</h1>
+    <p>Telusuri semua penerimaan dan pemakaian bahan baku.</p>
+  </div>
+
+  <form class="toolbar wrap" method="get" action="/laporan">
+    <div class="field"><label for="dari">Dari tanggal</label><div class="control"><input id="dari" name="dari" type="date" value="<%= filter.dari %>"></div></div>
+    <div class="field"><label for="sampai">Sampai tanggal</label><div class="control"><input id="sampai" name="sampai" type="date" value="<%= filter.sampai %>"></div></div>
+    <div class="field"><label for="jenis">Jenis</label>
+      <div class="control select"><select id="jenis" name="jenis">
+        <option value="">Semua</option>
+        <option value="masuk" <%= filter.jenis==='masuk' ? 'selected' : '' %>>Stok Masuk</option>
+        <option value="keluar" <%= filter.jenis==='keluar' ? 'selected' : '' %>>Stok Keluar</option>
+      </select><%- icon('chevron-down', 18) %></div>
+    </div>
+    <div class="field"><label for="kode">Bahan</label>
+      <div class="control select"><select id="kode" name="kode">
+        <option value="">Semua bahan</option>
+        <% bahanList.forEach(b => { %><option value="<%= b.kode %>" <%= filter.kode===b.kode ? 'selected' : '' %>><%= b.nama %></option><% }) %>
+      </select><%- icon('chevron-down', 18) %></div>
+    </div>
+    <button class="btn primary" type="submit">Terapkan</button>
+    <a class="btn secondary" href="/laporan">Atur ulang</a>
+  </form>
+
+  <div class="summary">
+    <div class="card"><span>Transaksi</span><strong><%= jml.total %></strong><small>tercatat</small></div>
+    <div class="card aman"><span>Stok masuk</span><strong><%= jml.masuk %></strong><small>transaksi</small></div>
+    <div class="card"><span>Stok keluar</span><strong><%= jml.keluar %></strong><small>transaksi</small></div>
+  </div>
+
+  <% if (!baris.length) { %>
+    <div class="empty"><%- icon('inbox', 32) %><h3>Data tidak ditemukan</h3><p>Ubah filter bahan atau periode.</p></div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Tanggal</th><th>Bahan</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th><th>Dicatat oleh</th></tr></thead>
+      <tbody>
+      <% baris.forEach(t => { const u = t.bahan ? t.bahan.satuanPakai : ''; %>
+        <tr>
+          <td data-label="Tanggal"><%= f.tanggalID(t.tanggal) %></td>
+          <td data-label="Bahan"><div class="ident"><strong><%= t.bahan ? t.bahan.nama : t.kode %></strong><small><%= t.kode %></small></div></td>
+          <td data-label="Jenis"><span class="badge <%= t.jenis==='masuk' ? 'aman' : 'netral' %>"><%= t.jenis==='masuk' ? 'Masuk' : 'Keluar' %></span></td>
+          <td data-label="Jumlah">
+            <strong><%= t.jenis==='masuk' ? '+' : '−' %><%= f.angka(t.jumlah) %> <%= u %></strong>
+            <% if (t.jenis==='masuk' && t.jumlahBeli) { %><small class="sub"><%= f.angka(t.jumlahBeli) %> <%= t.bahan ? t.bahan.satuanBeli : '' %></small><% } %>
+          </td>
+          <td data-label="Keterangan"><%= [t.pemasok, t.catatan].filter(Boolean).join(' · ') || '—' %></td>
+          <td data-label="Dicatat oleh"><%= users[t.oleh] || t.oleh %></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+  <p class="footnote">Jumlah ditampilkan dalam satuan pakai. Saldo berbeda satuan tidak dijumlahkan.</p>
+</section>
+<%- include('partials/footer') %>

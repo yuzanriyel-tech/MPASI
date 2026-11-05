@@ -1,0 +1,86 @@
+<%- include('partials/header', { title, active }) %>
+<section class="content">
+  <div class="page-title">
+    <h1>Stok Masuk</h1>
+    <p>Catat penerimaan dalam satuan beli. Saldo dikonversi otomatis.</p>
+  </div>
+
+  <div class="form-layout">
+    <form class="form-main" method="post" action="/stok-masuk" novalidate data-stok-form="masuk">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <% if (alert) { %>
+        <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+      <% } %>
+
+      <div class="panel">
+        <h2>Bahan yang diterima</h2>
+        <%- include('partials/combo-bahan', { values, errors, bahanData }) %>
+
+        <div class="field <%= errors.pemasok ? 'has-error' : '' %>">
+          <label for="pemasok">Pemasok *</label>
+          <div class="control select">
+            <select id="pemasok" name="pemasok">
+              <option value="">Pilih pemasok</option>
+              <% pemasok.forEach(p => { %><option value="<%= p %>" <%= values.pemasok === p ? 'selected' : '' %>><%= p %></option><% }) %>
+            </select>
+            <%- icon('chevron-down', 18) %>
+          </div>
+          <% if (errors.pemasok) { %><p class="err"><%= errors.pemasok %></p><% } %>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Detail penerimaan</h2>
+
+        <div class="field <%= errors.jumlah ? 'has-error' : '' %>">
+          <label for="jumlah">Jumlah dalam satuan beli *</label>
+          <div class="control">
+            <input id="jumlah" name="jumlah" type="text" inputmode="decimal" value="<%= values.jumlah || '' %>" placeholder="0" data-jumlah>
+            <span class="unit" data-unit-beli>satuan beli</span>
+          </div>
+          <% if (errors.jumlah) { %><p class="err"><%= errors.jumlah %></p><% } %>
+        </div>
+
+        <div class="alert info">
+          <%- icon('info', 20) %>
+          <div>
+            <strong>Konversi mengikuti bahan terpilih</strong>
+            <p data-preview>Pilih bahan dan masukkan jumlah positif untuk melihat preview satuan pakai.</p>
+          </div>
+        </div>
+
+        <div class="field <%= errors.tanggalMasuk ? 'has-error' : '' %>">
+          <label for="tanggalMasuk">Tanggal masuk *</label>
+          <div class="control date"><input id="tanggalMasuk" name="tanggalMasuk" type="date" value="<%= values.tanggalMasuk || '' %>"><%- icon('calendar-days', 18) %></div>
+          <% if (errors.tanggalMasuk) { %><p class="err"><%= errors.tanggalMasuk %></p><% } %>
+        </div>
+
+        <div class="field <%= errors.kedaluwarsa ? 'has-error' : '' %>">
+          <label for="kedaluwarsa">Tanggal kedaluwarsa *</label>
+          <div class="control date"><input id="kedaluwarsa" name="kedaluwarsa" type="date" value="<%= values.kedaluwarsa || '' %>"><%- icon('calendar-days', 18) %></div>
+          <% if (errors.kedaluwarsa) { %><p class="err"><%= errors.kedaluwarsa %></p><% } %>
+        </div>
+
+        <div class="field">
+          <label for="catatan">Catatan (opsional)</label>
+          <div class="control"><input id="catatan" name="catatan" type="text" maxlength="200" value="<%= values.catatan || '' %>" placeholder="Mis. nomor surat jalan"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn secondary" href="/">Batal</a>
+        <button type="submit" class="btn primary">Simpan</button>
+      </div>
+    </form>
+
+    <aside class="form-side">
+      <div class="panel dark">
+        <h2>Periksa penerimaan</h2>
+        <p>Cocokkan bahan, pemasok, jumlah kemasan, dan tanggal kedaluwarsa dengan barang yang diterima.</p>
+        <p>Satuan beli berbeda dengan satuan pakai. Susu Cair diterima per karton, digunakan per liter.</p>
+      </div>
+      <p class="footnote">Pencatat: <%= user.nama %> · <%= user.peran %> <br>Tanggal pencatatan: <%= f.tanggalID(hariIni) %></p>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

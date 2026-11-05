@@ -1,0 +1,76 @@
+<%- include('partials/header', { title, active }) %>
+<% const baru = mode === 'baru'; const action = baru ? '/master/baru' : `/master/${values.kode}/edit`; %>
+<section class="content">
+  <div class="page-title">
+    <h1><%= baru ? 'Tambah bahan' : 'Edit bahan' %></h1>
+    <p>Satuan beli dipakai saat penerimaan; satuan pakai dipakai untuk saldo, pemakaian, dan minimum stok.</p>
+  </div>
+
+  <form class="form-narrow" method="post" action="<%= action %>" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <% if (alert) { %>
+      <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+    <% } %>
+
+    <div class="panel">
+      <h2>Identitas bahan</h2>
+      <div class="field">
+        <label for="kode">Kode</label>
+        <div class="control readonly"><input id="kode" type="text" value="<%= values.kode %>" readonly></div>
+      </div>
+      <div class="field <%= errors.nama ? 'has-error' : '' %>">
+        <label for="nama">Nama bahan baku *</label>
+        <div class="control"><input id="nama" name="nama" type="text" value="<%= values.nama || '' %>" placeholder="Masukkan nama bahan"></div>
+        <% if (errors.nama) { %><p class="err"><%= errors.nama %></p><% } %>
+      </div>
+      <div class="field <%= errors.kategori ? 'has-error' : '' %>">
+        <label for="kategori">Kategori *</label>
+        <div class="control"><input id="kategori" name="kategori" type="text" list="daftar-kategori" value="<%= values.kategori || '' %>" placeholder="Mis. Kopi, Susu & Dairy, Sirup"></div>
+        <datalist id="daftar-kategori"><option value="Kopi"><option value="Susu &amp; Dairy"><option value="Sirup"></datalist>
+        <% if (errors.kategori) { %><p class="err"><%= errors.kategori %></p><% } %>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Satuan dan batas minimum</h2>
+      <div class="grid-2">
+        <div class="field <%= errors.satuanBeli ? 'has-error' : '' %>">
+          <label for="satuanBeli">Satuan beli *</label>
+          <div class="control"><input id="satuanBeli" name="satuanBeli" type="text" value="<%= values.satuanBeli || '' %>" placeholder="karton, kantong, botol"></div>
+          <% if (errors.satuanBeli) { %><p class="err"><%= errors.satuanBeli %></p><% } %>
+        </div>
+        <div class="field <%= errors.satuanPakai ? 'has-error' : '' %>">
+          <label for="satuanPakai">Satuan pakai *</label>
+          <div class="control"><input id="satuanPakai" name="satuanPakai" type="text" value="<%= values.satuanPakai || '' %>" placeholder="kg, liter"></div>
+          <% if (errors.satuanPakai) { %><p class="err"><%= errors.satuanPakai %></p><% } %>
+        </div>
+      </div>
+      <div class="field <%= errors.isi ? 'has-error' : '' %>">
+        <label for="isi">Isi per satuan beli (dalam satuan pakai) *</label>
+        <div class="control"><input id="isi" name="isi" type="text" inputmode="decimal" value="<%= values.isi || '' %>" placeholder="Mis. 12"></div>
+        <% if (errors.isi) { %><p class="err"><%= errors.isi %></p><% } %>
+        <p class="hint">Contoh: 1 karton Susu Cair = 12 liter.</p>
+      </div>
+      <div class="field <%= errors.minimum ? 'has-error' : '' %>">
+        <label for="minimum">Minimum stok *</label>
+        <div class="control"><input id="minimum" name="minimum" type="text" inputmode="decimal" value="<%= values.minimum || '' %>" placeholder="0"><span class="unit"><%= values.satuanPakai || 'satuan pakai' %></span></div>
+        <% if (errors.minimum) { %><p class="err"><%= errors.minimum %></p><% } %>
+      </div>
+      <% if (baru) { %>
+      <div class="field <%= errors.saldo ? 'has-error' : '' %>">
+        <label for="saldo">Saldo awal</label>
+        <div class="control"><input id="saldo" name="saldo" type="text" inputmode="decimal" value="<%= values.saldo ?? '0' %>"></div>
+        <% if (errors.saldo) { %><p class="err"><%= errors.saldo %></p><% } %>
+      </div>
+      <% } else { %>
+      <p class="hint">Saldo saat ini <%= f.angka(values.saldo) %> <%= values.satuanPakai %> hanya berubah lewat Stok Masuk dan Stok Keluar.</p>
+      <% } %>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" href="/master">Batal</a>
+      <button type="submit" class="btn primary">Simpan</button>
+    </div>
+  </form>
+</section>
+<%- include('partials/footer') %>

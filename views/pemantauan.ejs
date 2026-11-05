@@ -1,0 +1,47 @@
+<%- include('partials/header', { title, active }) %>
+<section class="content">
+  <div class="page-title">
+    <h1>Pemantauan Stok Minimum Bulanan</h1>
+    <p>Pantau saldo awal, penerimaan, pemakaian, dan saldo akhir per bahan pada <%= bulanLabel %>.</p>
+  </div>
+
+  <form class="toolbar" method="get" action="/pemantauan">
+    <div class="field grow">
+      <label for="bulan">Periode</label>
+      <div class="control date"><input id="bulan" name="bulan" type="month" value="<%= bulan %>"><%- icon('calendar-days', 18) %></div>
+    </div>
+    <button class="btn primary" type="submit">Tampilkan</button>
+  </form>
+
+  <% if (kosong) { %>
+    <div class="empty">
+      <%- icon('inbox', 32) %>
+      <h3>Data tidak ditemukan</h3>
+      <p>Belum ada transaksi pada <%= bulanLabel %>. Ubah periode untuk melihat bulan lain.</p>
+    </div>
+  <% } else { %>
+    <% if (perluCount) { %>
+      <div class="alert err"><%- icon('circle-alert', 20) %><div><strong><%= perluCount %> bahan di bawah atau sama dengan minimum</strong><p>Saldo akhir <%= bulanLabel %> perlu ditinjau untuk pemesanan ulang.</p></div></div>
+    <% } %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Bahan</th><th>Saldo awal</th><th>Masuk</th><th>Keluar</th><th>Saldo akhir</th><th>Minimum</th><th>Status</th></tr></thead>
+        <tbody>
+        <% baris.forEach(r => { const u = r.b.satuanPakai; %>
+          <tr>
+            <td data-label="Bahan"><div class="ident"><strong><%= r.b.nama %></strong><small><%= r.b.kode %></small></div></td>
+            <td data-label="Saldo awal"><%= f.angka(r.awal) %> <%= u %></td>
+            <td data-label="Masuk">+<%= f.angka(r.masuk) %> <%= u %></td>
+            <td data-label="Keluar">−<%= f.angka(r.keluar) %> <%= u %></td>
+            <td data-label="Saldo akhir"><span class="saldo <%= r.perlu ? 'bahaya' : '' %>"><%= f.angka(r.akhir) %> <%= u %></span></td>
+            <td data-label="Minimum"><%= f.angka(r.b.minimum) %> <%= u %></td>
+            <td data-label="Status"><span class="badge <%= r.perlu ? 'bahaya' : 'aman' %>"><span class="mark" aria-hidden="true"><%= r.perlu ? '!' : '✓' %></span> <%= r.perlu ? 'Perlu dipesan ulang' : 'Aman' %></span></td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+  <p class="footnote">Saldo berbeda satuan tidak dijumlahkan. Status dinilai dari saldo akhir periode terhadap minimum stok.</p>
+</section>
+<%- include('partials/footer') %>

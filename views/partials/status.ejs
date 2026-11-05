@@ -1,0 +1,2 @@
+<% /* Param: b (bahan) */ const perlu = perluPesan(b); %>
+<span class="badge <%= perlu ? 'bahaya' : 'aman' %>"><span class="mark" aria-hidden="true"><%= perlu ? '!' : '✓' %></span> <%= perlu ? 'Perlu dipesan ulang' : 'Aman' %></span>

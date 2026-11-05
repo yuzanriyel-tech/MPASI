@@ -1,0 +1,49 @@
+<%- include('partials/header', { title, active }) %>
+<section class="content">
+  <div class="page-title">
+    <h1>Stok Keluar</h1>
+    <p>Catat pemakaian setelah bahan digunakan. Saldo diperbarui setelah disimpan.</p>
+  </div>
+
+  <div class="form-layout">
+    <form class="form-main" method="post" action="/stok-keluar" novalidate data-stok-form="keluar">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <% if (alert) { %>
+        <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+      <% } %>
+
+      <div class="panel">
+        <h2>Bahan yang digunakan</h2>
+        <%- include('partials/combo-bahan', { values, errors, bahanData }) %>
+
+        <div class="field <%= errors.jumlah ? 'has-error' : '' %>">
+          <label for="jumlah">Jumlah pemakaian *</label>
+          <div class="control">
+            <input id="jumlah" name="jumlah" type="text" inputmode="decimal" value="<%= values.jumlah || '' %>" placeholder="0" data-jumlah>
+            <span class="unit" data-unit-pakai>satuan</span>
+          </div>
+          <% if (errors.jumlah) { %><p class="err"><%= errors.jumlah %></p><% } %>
+        </div>
+
+        <div class="field">
+          <label for="catatan">Catatan (opsional)</label>
+          <div class="control"><input id="catatan" name="catatan" type="text" maxlength="200" value="<%= values.catatan || '' %>" placeholder="Mis. produksi pagi"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn secondary" href="/">Batal</a>
+        <button type="submit" class="btn primary">Simpan</button>
+      </div>
+    </form>
+
+    <aside class="form-side">
+      <div class="panel dark">
+        <h2>Catat pemakaian</h2>
+        <p>Isi jumlah sesuai satuan pakai bahan. Jumlah tidak boleh melebihi saldo tersedia.</p>
+      </div>
+      <p class="footnote">Pencatat: <%= user.nama %> · <%= user.peran %> <br>Tanggal pencatatan: <%= f.tanggalID(hariIni) %></p>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

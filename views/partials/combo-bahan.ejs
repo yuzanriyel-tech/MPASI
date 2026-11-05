@@ -1,0 +1,19 @@
+<% /* Param: values, errors, bahanData */
+   const terpilih = values.kode ? bahanData.find(b => b.kode === values.kode) : null; %>
+<div class="field <%= errors.kode ? 'has-error' : '' %>">
+  <label for="bahan-q">Bahan baku *</label>
+  <div class="combo" data-combo>
+    <div class="control">
+      <%- icon('search', 17) %>
+      <input id="bahan-q" type="text" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="bahan-list"
+             placeholder="Cari nama atau kode bahan" value="<%= terpilih ? terpilih.nama : '' %>" data-combo-input>
+      <%- icon('chevron-down', 18) %>
+    </div>
+    <input type="hidden" name="kode" value="<%= values.kode || '' %>" data-combo-value>
+    <ul class="combo-list" id="bahan-list" role="listbox" hidden></ul>
+  </div>
+  <% if (errors.kode) { %><p class="err"><%= errors.kode %></p><% } %>
+  <p class="hint">Cari berdasarkan nama bahan atau kode BB.</p>
+  <p class="hint" data-saldo-info>Saldo dan satuan tampil setelah bahan dipilih.</p>
+</div>
+<script type="application/json" id="bahan-data"><%- JSON.stringify(bahanData).replace(/</g, '\\u003c') %></script>

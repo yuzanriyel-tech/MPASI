@@ -50,11 +50,11 @@
     <aside class="split-side">
       <h3>Catat Aktivitas Bahan</h3>
       <div class="quick">
-        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-          <a class="btn primary" href="/stok-keluar">Catat Stok Keluar</a>
+        <div class="quick-actions">
+          <a class="btn primary" href="/stok-keluar">Stok Keluar</a>
           <a class="btn light" href="/stok-masuk">Stok Masuk</a>
         </div>
-        <p style="font-size: 14px; line-height: 1.5;">Catat pemakaian setelah bahan digunakan. Saldo diperbarui setelah disimpan.</p>
+        <p>Catat pemakaian setelah bahan digunakan. Saldo diperbarui setelah disimpan.</p>
       </div>
 
       <% if (perlu.length) { %>
@@ -66,7 +66,7 @@
         </div>
       </div>
       <% } else if (daftar.length > 0) { %>
-      <div class="alert ok" style="width: 350.9px; max-width: 100%; margin: 0 auto;">
+      <div class="alert ok">
         <%- icon('circle-check', 20) %>
         <div>
           <strong>Stok aman</strong>

@@ -35,14 +35,20 @@
     });
   }
 
-  /* ---------- Tampilkan / sembunyikan password ---------- */
+    /* ---------- Tampilkan / sembunyikan password ---------- */
   document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+    var ikon = btn.querySelector('svg');
+    var tutup = ikon ? ikon.innerHTML : '';          // ikon mata dicoret (password tersembunyi)
+    var buka = btn.getAttribute('data-icon-show') || ''; // ikon mata terbuka (password terlihat)
+
     btn.addEventListener('click', function () {
       var input = document.querySelector(btn.getAttribute('data-toggle-password'));
       if (!input) return;
       var show = input.type === 'password';
       input.type = show ? 'text' : 'password';
       btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+      btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+      if (ikon && buka) ikon.innerHTML = show ? buka : tutup;
     });
   });
 

@@ -10,7 +10,7 @@
     <% } %>
   </div>
 
-  <form class="form-narrow" method="post" action="<%= action %>" novalidate>
+  <form class="form-wide" method="post" action="<%= action %>" novalidate>
     <input type="hidden" name="_csrf" value="<%= csrf %>">
     <% if (alert) { %>
       <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
@@ -19,6 +19,8 @@
     <div class="panel">
       <h2>Informasi bahan</h2>
       <p class="hint" style="margin-top: -8px; margin-bottom: 16px;">Tanda * menunjukkan kolom wajib.</p>
+      
+      <div class="form-grid">
 
       <div class="field <%= errors.nama ? 'has-error' : '' %>">
         <label for="nama">Nama bahan baku *</label>
@@ -28,57 +30,55 @@
 
       <div class="field <%= errors.kategori ? 'has-error' : '' %>">
         <label for="kategori">Kategori *</label>
-        <div class="control">
+        <div class="control select">
           <select id="kategori" name="kategori">
             <option value="" disabled <%= !values.kategori ? 'selected' : '' %>>Pilih kategori</option>
             <% ['Kopi', 'Susu & Dairy', 'Sirup', 'Lainnya'].forEach(k => { %>
               <option value="<%= k %>" <%= values.kategori === k ? 'selected' : '' %>><%= k %></option>
             <% }) %>
-          </select>
+          </select><%- icon('chevron-down', 18) %>
         </div>
         <% if (errors.kategori) { %><p class="err"><%= errors.kategori %></p><% } %>
       </div>
 
       <div class="field <%= errors.pemasok ? 'has-error' : '' %>">
         <label for="pemasok">Pemasok utama *</label>
-        <div class="control">
+        <div class="control select">
           <select id="pemasok" name="pemasok">
             <option value="" disabled <%= !values.pemasok ? 'selected' : '' %>>Pilih pemasok</option>
             <% (daftarPemasok || []).forEach(p => { %>
               <option value="<%= p %>" <%= values.pemasok === p ? 'selected' : '' %>><%= p %></option>
             <% }) %>
-          </select>
+          </select><%- icon('chevron-down', 18) %>
         </div>
         <% if (errors.pemasok) { %><p class="err"><%= errors.pemasok %></p><% } %>
       </div>
 
-      <div class="grid-2">
         <div class="field <%= errors.satuanBeli ? 'has-error' : '' %>">
           <label for="satuanBeli">Satuan beli *</label>
-          <div class="control">
+          <div class="control select">
             <select id="satuanBeli" name="satuanBeli">
               <option value="" disabled <%= !values.satuanBeli ? 'selected' : '' %>>Pilih</option>
               <% ['karton', 'kantong', 'botol', 'kg', 'liter', 'pcs'].forEach(s => { %>
                 <option value="<%= s %>" <%= values.satuanBeli === s ? 'selected' : '' %>><%= s %></option>
               <% }) %>
-            </select>
+            </select><%- icon('chevron-down', 18) %>
           </div>
           <% if (errors.satuanBeli) { %><p class="err"><%= errors.satuanBeli %></p><% } %>
         </div>
 
         <div class="field <%= errors.satuanPakai ? 'has-error' : '' %>">
           <label for="satuanPakai">Satuan pakai *</label>
-          <div class="control">
+          <div class="control select">
             <select id="satuanPakai" name="satuanPakai">
               <option value="" disabled <%= !values.satuanPakai ? 'selected' : '' %>>Pilih</option>
               <% ['kg', 'liter', 'gram', 'ml', 'pcs'].forEach(s => { %>
                 <option value="<%= s %>" <%= values.satuanPakai === s ? 'selected' : '' %>><%= s %></option>
               <% }) %>
-            </select>
+            </select><%- icon('chevron-down', 18) %>
           </div>
           <% if (errors.satuanPakai) { %><p class="err"><%= errors.satuanPakai %></p><% } %>
         </div>
-      </div>
 
       <div class="field <%= errors.isi ? 'has-error' : '' %>">
         <label for="isi">Isi per satuan beli *</label>
@@ -86,7 +86,10 @@
           <input id="isi" name="isi" type="text" inputmode="decimal" value="<%= values.isi || '' %>" placeholder="1">
           <span class="unit"><%= values.satuanPakai || 'pakai' %> / <%= values.satuanBeli || 'beli' %></span>
         </div>
-        <% if (errors.isi) { %><p class="err"><%= errors.isi %></p><% } %>
+        <% if (errors.isi) { %><p class="err"><%= errors.isi %></p>
+        <% } else if (values.isi && values.satuanBeli && values.satuanPakai) { %>
+          <p class="hint">1 <%= values.satuanBeli %> = <%= values.isi %> <%= values.satuanPakai %></p>
+        <% } %>
       </div>
 
       <div class="field <%= errors.minimum ? 'has-error' : '' %>">
@@ -108,10 +111,11 @@
         <% if (errors.masaSimpan) { %><p class="err"><%= errors.masaSimpan %></p><% } %>
         <p class="hint">Dihitung sejak tanggal masuk.</p>
       </div>
+      </div>
     </div>
 
     <% if (!baru && values.saldo !== undefined) { %>
-    <div class="alert info" style="margin-bottom: 24px;">
+    <div class="alert info">
       <%- icon('info', 20) %>
       <div>
         <strong>Dampak perubahan minimum</strong>
@@ -120,14 +124,13 @@
     </div>
     <% } %>
 
-    <div class="actions">
-      <% if (!baru) { %>
-        <!-- Tombol hapus dengan pop-up konfirmasi -->
-        <button type="submit" formaction="/master/<%= values.kode %>/hapus" class="btn err outline" style="margin-right: auto;" onclick="return confirm('Yakin ingin menghapus <%= values.nama %>? Data yang dihapus tidak bisa dikembalikan.')">Hapus</button>
-      <% } %>
-      
+    <div class="actions form-actions">
       <a class="btn secondary" href="/master">Batal</a>
       <button type="submit" class="btn primary">Simpan</button>
+      <% if (!baru) { %>
+        <!-- Tombol hapus dengan pop-up konfirmasi -->
+        <button type="submit" formaction="/master/<%= values.kode %>/hapus" class="btn danger-outline btn-hapus" onclick="return confirm('Yakin ingin menghapus <%= values.nama %>? Data yang dihapus tidak bisa dikembalikan.')">Hapus</button>
+      <% } %>
     </div>
   </form>
 </section>

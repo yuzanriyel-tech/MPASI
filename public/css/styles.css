@@ -371,3 +371,51 @@ button, input, select { font: inherit; color: inherit; }
   .month-picker { max-width: none; }
   .month-panel { left: 0; right: 0; min-width: 0; }
 }
+/* ====================== Laporan & Pemantauan (revisi) ====================== */
+.list-title { display: grid; gap: 4px; }
+.alert p + p { margin-top: 6px; }
+.alert.info strong { color: var(--hijau-utama); }
+.alert.info p { color: var(--teks-sekunder); }
+.saldo-kecil { font-weight: 600; }
+.saldo-kecil.bahaya { color: var(--error); }
+.alasan-extra { margin-top: 6px; }
+.table td .sub { margin-top: 3px; }
+.filter-card { gap: 12px; }
+.filter-card .month-picker { max-width: 320px; }
+@media (max-width: 900px) {
+  .content .alert { margin: 0; }
+  .filter-card .month-picker { max-width: none; }
+  .table td .badge { width: 100%; justify-content: center; }
+}
+
+/* ===== Dashboard: tombol aksi cepat ===== */
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.quick-actions .btn { width: 100%; min-width: 0; padding: 12px 10px; }
+.split-side .alert { width: 100%; margin: 0; }
+
+/* ===== Akun: "Akun Anda" sejajar tengah dengan tombol Edit ===== */
+.row-actions { align-items: center; }
+.akun-anda { display: inline-flex; align-items: center; min-height: 48px; font-size: 12px; color: var(--teks-sekunder); }
+
+/* ===== Form master bahan: 2 kolom ===== */
+.form-wide { display: flex; flex-direction: column; gap: 18px; width: 100%; }
+.form-wide .panel > div > .hint { margin-top: 6px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; align-items: start; }
+.form-actions { justify-content: flex-start; flex-wrap: wrap; padding: 6px 0 0; }
+.form-wide .form-actions .btn { flex: 0 0 auto; min-width: 100px; }
+.form-wide .form-actions .btn-hapus { margin-left: auto; }
+
+/* Tablet (641–900 px): tetap 2 kolom */
+@media (max-width: 900px) {
+  .form-grid { grid-template-columns: 1fr 1fr; gap: 18px 16px; }
+  .quick-actions { grid-template-columns: 1fr 1fr; }
+  .quick .quick-actions, .quick p { flex-basis: 100%; }
+}
+
+/* Ponsel (≤ 640 px): 1 kolom, tombol penuh */
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-wide .form-actions .btn { flex: 1 1 calc(50% - 6px); }
+  .form-wide .form-actions .btn-hapus { flex: 1 1 100%; margin-left: 0; order: 3; }
+  .row-actions .akun-anda { flex: 1 1 100%; justify-content: center; text-align: center; min-height: 0; }
+}

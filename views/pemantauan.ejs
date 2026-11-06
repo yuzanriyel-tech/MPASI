@@ -1,14 +1,14 @@
 <%- include('partials/header', { title, active }) %>
 <section class="content">
   <div class="page-title">
-    <h1>Pemantauan Stok Minimum Bulanan</h1>
-    <p>Pantau saldo awal, penerimaan, pemakaian, dan saldo akhir per bahan pada <%= bulanLabel %>.</p>
+    <h1>Pemantauan Bulanan</h1>
+    <p>Prioritaskan pemesanan berdasarkan minimum dan kedaluwarsa.</p>
   </div>
 
   <% const NAMA_BULAN = f.BULAN; const bulanAktif = Number(bulan.slice(5)); const tahunAktif = Number(bulan.slice(0, 4)); %>
-  <div class="toolbar">
-    <div class="field grow">
-      <span class="label" id="lbl-periode">Periode</span>
+  <div class="panel filter-card">
+    <div class="field">
+      <span class="label" id="lbl-periode">Bulan pemantauan</span>
       <div class="dropdown month-picker" data-dropdown>
         <button type="button" class="control month-btn" aria-labelledby="lbl-periode" aria-haspopup="true" aria-expanded="<%= bukaPemilih %>" data-dropdown-toggle>
           <%- icon('calendar-days', 18) %><span><%= bulanLabel %></span><%- icon('chevron-down', 18) %>
@@ -26,46 +26,88 @@
           </div>
         </div>
       </div>
+      <p class="hint">Menampilkan saldo ≤ minimum dan batch yang mendekati kedaluwarsa pada bulan dipilih.</p>
     </div>
   </div>
 
-  <% if (!kosong) { %>
-  <div class="summary">
-    <div class="card"><span>Bahan dipantau</span><strong><%= baris.length %></strong><small>bahan</small></div>
-    <div class="card bahaya"><span>Perlu dipesan</span><strong><%= perluCount %></strong><small>bahan</small></div>
-    <div class="card aman"><span>Stok aman</span><strong><%= amanCount %></strong><small>bahan</small></div>
-  </div>
-  <% } %>
-
-  <% if (kosong) { %>
+  <% if (aman) { %>
     <div class="empty">
       <%- icon('inbox', 32) %>
-      <h3>Data tidak ditemukan</h3>
-      <p>Belum ada transaksi pada <%= bulanLabel %>. Ubah periode untuk melihat bulan lain.</p>
+      <h3>Stok aman</h3>
+      <p>Seluruh saldo di atas minimum. Tidak ada batch mendekati kedaluwarsa pada <%= bulanLabel %>.</p>
     </div>
   <% } else { %>
-    <% if (perluCount) { %>
-      <div class="alert err"><%- icon('circle-alert', 20) %><div><strong><%= perluCount %> bahan di bawah atau sama dengan minimum</strong><p>Saldo akhir <%= bulanLabel %> perlu ditinjau untuk pemesanan ulang.</p></div></div>
+    <div class="summary">
+      <div class="card"><strong><%= perluList.length %> bahan</strong><small>Saldo ≤ minimum</small></div>
+      <div class="card"><strong><%= batchBulan.length %> batch</strong><small>Kedaluwarsa bulan ini</small></div>
+    </div>
+
+    <% if (perluList.length) { %>
+      <div class="alert err">
+        <%- icon('circle-alert', 20) %>
+        <div>
+          <% if (perluList.length === 1) { const r = perluList[0]; %>
+            <strong>Pesan ulang <%= r.b.nama %></strong>
+            <p>Saldo <%= f.angka(r.saldo) %> <%= r.b.satuanPakai %> ≤ minimum <%= f.angka(r.b.minimum) %> <%= r.b.satuanPakai %>. Rekomendasi: <%= f.angka(r.jumlahBeli) %> <%= r.b.satuanBeli %> = <%= f.angka(r.jumlahPakai) %> <%= r.b.satuanPakai %><%= r.pemasok ? ', dari ' + r.pemasok : '' %>.</p>
+          <% } else { %>
+            <strong>Pesan ulang <%= perluList.length %> bahan</strong>
+            <% perluList.forEach(r => { %>
+              <p><b><%= r.b.nama %></b>: saldo <%= f.angka(r.saldo) %> ≤ minimum <%= f.angka(r.b.minimum) %> <%= r.b.satuanPakai %>. Rekomendasi: <%= f.angka(r.jumlahBeli) %> <%= r.b.satuanBeli %> = <%= f.angka(r.jumlahPakai) %> <%= r.b.satuanPakai %><%= r.pemasok ? ', dari ' + r.pemasok : '' %>.</p>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
     <% } %>
+
+    <% if (rekomendasi.length) { %>
+    <div class="list-title"><h2>Rekomendasi pemesanan</h2></div>
     <div class="table-wrap">
       <table class="table">
-        <thead><tr><th>Bahan</th><th>Saldo awal</th><th>Masuk</th><th>Keluar</th><th>Saldo akhir</th><th>Minimum</th><th>Status</th></tr></thead>
+        <thead><tr><th>Bahan</th><th>Saldo / minimum</th><th>Alasan</th><th>Rekomendasi</th><th>Pemasok</th></tr></thead>
         <tbody>
-        <% baris.forEach(r => { const u = r.b.satuanPakai; %>
+        <% rekomendasi.forEach(r => { const u = r.b.satuanPakai; %>
           <tr>
             <td data-label="Bahan"><div class="ident"><strong><%= r.b.nama %></strong><small><%= r.b.kode %></small></div></td>
-            <td data-label="Saldo awal"><%= f.angka(r.awal) %> <%= u %></td>
-            <td data-label="Masuk">+<%= f.angka(r.masuk) %> <%= u %></td>
-            <td data-label="Keluar">−<%= f.angka(r.keluar) %> <%= u %></td>
-            <td data-label="Saldo akhir"><span class="saldo <%= r.perlu ? 'bahaya' : '' %>"><%= f.angka(r.akhir) %> <%= u %></span></td>
-            <td data-label="Minimum"><%= f.angka(r.b.minimum) %> <%= u %></td>
-            <td data-label="Status"><span class="badge <%= r.perlu ? 'bahaya' : 'aman' %>"><span class="mark" aria-hidden="true"><%= r.perlu ? '!' : '✓' %></span> <%= r.perlu ? 'Perlu dipesan ulang' : 'Aman' %></span></td>
+            <td data-label="Saldo / minimum"><span class="saldo-kecil <%= r.perlu ? 'bahaya' : '' %>"><%= f.angka(r.saldo) %> <%= u %></span> / <%= f.angka(r.b.minimum) %> <%= u %></td>
+            <td data-label="Alasan">
+              <% if (r.perlu) { %>
+                <span class="badge bahaya"><span class="mark" aria-hidden="true">!</span> Perlu dipesan ulang</span>
+                <% if (r.adaBatch) { %><small class="sub alasan-extra">Batch kedaluwarsa bulan ini</small><% } %>
+              <% } else { %>Mendekati kedaluwarsa · <%= bulanLabel %><% } %>
+            </td>
+            <td data-label="Rekomendasi"><strong><%= f.angka(r.jumlahBeli) %> <%= r.b.satuanBeli %> = <%= f.angka(r.jumlahPakai) %> <%= u %></strong><% if (!r.perlu) { %><small class="sub">untuk antisipasi</small><% } %></td>
+            <td data-label="Pemasok"><%= r.pemasok || '—' %></td>
           </tr>
         <% }) %>
         </tbody>
       </table>
     </div>
+    <% } %>
+
+    <% if (batchBulan.length) { %>
+    <div class="list-title"><h2>Batch mendekati kedaluwarsa</h2></div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Bahan</th><th>Kode batch</th><th>Sisa batch</th><th>Tanggal kedaluwarsa</th><th>Alasan</th></tr></thead>
+        <tbody>
+        <% batchBulan.forEach(x => { %>
+          <tr>
+            <td data-label="Bahan"><div class="ident"><strong><%= x.bahan.nama %></strong><small><%= x.kode %></small></div></td>
+            <td data-label="Kode batch"><%= x.kodeBatch %></td>
+            <td data-label="Sisa batch"><strong><%= f.angka(x.sisa) %> <%= x.bahan.satuanPakai %></strong></td>
+            <td data-label="Tanggal kedaluwarsa"><%= f.tanggalID(x.kedaluwarsa) %></td>
+            <td data-label="Alasan">Kedaluwarsa di bulan dipilih</td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
   <% } %>
-  <p class="footnote">Saldo berbeda satuan tidak dijumlahkan. Status dinilai dari saldo akhir periode terhadap minimum stok.</p>
+
+  <div class="alert info">
+    <%- icon('info', 20) %>
+    <div><strong>FEFO berjalan otomatis</strong><p>Batch dengan kedaluwarsa terdekat digunakan lebih dulu. Rekomendasi ini membantu keputusan pemesanan, bukan mencatat transaksi.</p></div>
+  </div>
 </section>
 <%- include('partials/footer') %>

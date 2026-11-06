@@ -22,11 +22,43 @@
     </div>
   <% } else { %>
   <div class="table-wrap">
-  </table>
+    <table class="table">
+      <thead>
+        <tr><th>Nama</th><th>Username</th><th>Peran</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+      <% akun.forEach(a => { const diriSendiri = a.username === user.username; %>
+        <tr>
+          <td data-label="Nama"><strong><%= a.nama %></strong></td>
+          <td data-label="Username"><%= a.username %></td>
+          <td data-label="Peran"><%= a.peran %></td>
+          <td data-label="Status">
+            <span class="badge <%= a.aktif ? 'aman' : 'netral' %>"><%= a.aktif ? 'Aktif' : 'Nonaktif' %></span>
+          </td>
+          <td data-label="Aksi">
+            <div class="row-actions">
+              <a class="btn secondary" href="/akun/<%= a.username %>/edit">Edit</a>
+              <% if (diriSendiri) { %>
+                <span class="muted" style="margin-top: 2px;">
+                  Akun Anda
+                </span>
+              <% } else if (a.aktif) { %>
+                <button type="button" class="btn secondary" data-open-dialog="dlg-<%= a.username %>">Nonaktifkan</button>
+              <% } else { %>
+                <form method="post" action="/akun/<%= a.username %>/aktifkan">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button type="submit" class="btn secondary">Aktifkan</button>
+                </form>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
   </div>
   <% } %>
   <p class="footnote"><%= akun.length %> dari <%= totalAkun %> akun ditampilkan · Akun sendiri tidak memiliki aksi Nonaktifkan.</p>
-  <p class="footnote">Akun sendiri tidak memiliki aksi Nonaktifkan.</p>
 
   <% akun.filter(a => a.aktif && a.username !== user.username).forEach(a => { %>
   <dialog class="dialog" id="dlg-<%= a.username %>" aria-labelledby="dlg-t-<%= a.username %>">

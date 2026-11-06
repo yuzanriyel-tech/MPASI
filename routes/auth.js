@@ -19,7 +19,7 @@ router.post('/login', (req, res) => {
   if (!u || !u.aktif || !db.verifyPassword(password, u.password)) {
     return res.status(401).render('login', {
       title: 'Login',
-      error: { judul: 'Login gagal', isi: 'Username atau password salah, atau akun tidak aktif. Periksa kembali lalu coba lagi.' },
+      error: { judul: 'Username atau password salah', isi: 'Periksa kembali username dan password Anda.' },
       errors: {}, values: { username }
     });
   }

@@ -17,10 +17,13 @@ router.get('/pemantauan', wajibPengelola, (req, res) => {
     const akhir = db.saldoAwalBulan(b, berikut);
     return { b, awal, masuk: db.round(masuk), keluar: db.round(keluar), akhir, perlu: akhir <= b.minimum };
   });
+  const perluCount = baris.filter((r) => r.perlu).length;
   res.render('pemantauan', {
     title: 'Pemantauan Stok Minimum Bulanan', active: 'pemantauan',
     bulan, bulanLabel: bulanID(bulan), baris, kosong: txBulan.length === 0,
-    perluCount: baris.filter((r) => r.perlu).length
+    perluCount, amanCount: baris.length - perluCount,
+    tahunPanel: /^\d{4}$/.test(String(req.query.th || '')) ? Number(req.query.th) : y,
+    bukaPemilih: req.query.buka === '1'
   });
 });
 

@@ -6,7 +6,11 @@ const WAJIB = 'Data wajib diisi';
 const PERAN = ['Pengelola', 'Karyawan'];
 
 router.get('/akun', wajibPengelola, (req, res) => {
-  res.render('akun', { title: 'Akun Pengguna', active: 'akun', akun: db.users() });
+  const cari = String(req.query.q || '').trim();
+  const kunci = cari.toLowerCase();
+  const semua = db.users();
+  const akun = kunci ? semua.filter((a) => (a.nama + ' ' + a.username + ' ' + a.peran).toLowerCase().includes(kunci)) : semua;
+  res.render('akun', { title: 'Akun Pengguna', active: 'akun', akun, cari, totalAkun: semua.length });
 });
 
 function form(res, { mode, values = {}, errors = {}, alert = null, status = 200 }) {

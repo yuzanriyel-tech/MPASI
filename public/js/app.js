@@ -57,6 +57,80 @@
     b.addEventListener('click', function () { var d = b.closest('dialog'); if (d) d.close(); });
   });
 
+    /* ---------- Pencarian global (dropdown hasil di navbar) ---------- */
+  (function () {
+    var form = document.querySelector('[data-gsearch]');
+    if (!form) return;
+    var inp = form.querySelector('[data-gsearch-input]');
+    var panel = form.querySelector('.gsearch-panel');
+    var timer = null, seq = 0, idx = -1;
+
+    function angka(n) {
+      n = Math.round(n * 1000) / 1000;
+      var s = String(n).split('.');
+      s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      return s.join(',');
+    }
+    function tutup() { panel.hidden = true; inp.setAttribute('aria-expanded', 'false'); idx = -1; }
+    function buka() { panel.hidden = false; inp.setAttribute('aria-expanded', 'true'); }
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+    function tampil(data) {
+      panel.textContent = '';
+      idx = -1;
+      if (!data.bahan.length) {
+        var kosong = el('div', 'gs-empty');
+        kosong.appendChild(el('strong', null, 'Tidak ditemukan'));
+        kosong.appendChild(el('small', null, 'Tidak ada bahan baku untuk “' + data.q + '”. Coba nama atau kode lain.'));
+        panel.appendChild(kosong);
+        buka();
+        return;
+      }
+      panel.appendChild(el('p', 'gs-group', 'Hasil bahan baku'));
+      data.bahan.forEach(function (b) {
+        var a = el('a', 'gs-item');
+        a.setAttribute('role', 'option');
+        a.href = '/?q=' + encodeURIComponent(b.kode);
+        var kiri = el('span', 'gs-main');
+        kiri.appendChild(el('strong', null, b.nama));
+        kiri.appendChild(el('small', null, b.kode + ' · ' + b.kategori));
+        var kanan = el('span', 'gs-side' + (b.perlu ? ' bahaya' : ''));
+        kanan.textContent = angka(b.saldo) + ' ' + b.satuanPakai;
+        a.appendChild(kiri); a.appendChild(kanan);
+        panel.appendChild(a);
+      });
+      var semua = el('a', 'gs-all', 'Lihat semua hasil (' + data.total + ')');
+      semua.href = '/?q=' + encodeURIComponent(data.q);
+      panel.appendChild(semua);
+      buka();
+    }
+
+    function cari() {
+      var q = inp.value.trim();
+      if (!q) { tutup(); return; }
+      var mine = ++seq;
+      fetch('/api/cari?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (d) { if (mine === seq) tampil(d); })
+        .catch(function () { if (mine === seq) tutup(); });
+    }
+
+    inp.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(cari, 180); });
+    inp.addEventListener('focus', function () { if (inp.value.trim() && panel.childNodes.length) buka(); });
+    inp.addEventListener('keydown', function (e) {
+      var items = panel.querySelectorAll('.gs-item');
+      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && items.length) {
+        e.preventDefault();
+        idx = (idx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach(function (it, i) { it.setAttribute('aria-selected', String(i === idx)); });
+        items[idx].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter' && idx >= 0 && items[idx]) {
+        e.preventDefault(); window.location.href = items[idx].href;
+      } else if (e.key === 'Escape') { tutup(); }
+    });
+    document.addEventListener('click', function (e) { if (!form.contains(e.target)) tutup(); });
+  })();
+
   /* ---------- Form stok: combobox bahan + satuan + preview konversi ---------- */
   var dataEl = document.getElementById('bahan-data');
   var combo = document.querySelector('[data-combo]');

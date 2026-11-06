@@ -298,3 +298,76 @@ button, input, select { font: inherit; color: inherit; }
   .auth-card h1 { font-size: 28px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ====================== Tambahan hasil perbandingan Figma ====================== */
+
+/* Pencarian global: dropdown hasil / tidak ditemukan */
+.gsearch { position: relative; }
+.gsearch-panel { position: absolute; top: calc(100% + 8px); right: 0; width: 340px; max-width: calc(100vw - 32px); background: #fff; border: 1px solid var(--garis); border-radius: 12px; box-shadow: 0 8px 24px rgba(53,39,31,.12); padding: 6px; z-index: 50; }
+.gs-group { padding: 8px 12px 4px; font-size: 10px; font-weight: 600; letter-spacing: .02em; color: var(--teks-sekunder); text-transform: uppercase; }
+.gs-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 8px; color: var(--teks-utama); }
+.gs-item:hover, .gs-item[aria-selected="true"] { background: var(--netral-lembut); }
+.gs-main { display: grid; gap: 2px; min-width: 0; }
+.gs-main strong { font-size: 13px; }
+.gs-main small { font-size: 11px; color: var(--teks-sekunder); }
+.gs-side { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.gs-side.bahaya { color: var(--error); }
+.gs-all { display: block; margin-top: 4px; padding: 10px 12px; border-top: 1px solid var(--garis); font-size: 12px; font-weight: 600; color: var(--hijau-utama); }
+.gs-empty { display: grid; gap: 4px; padding: 16px 12px; }
+.gs-empty strong { font-size: 13px; }
+.gs-empty small { font-size: 12px; color: var(--teks-sekunder); }
+
+/* Dropdown profil: kepala nama + peran */
+.profile-head { display: grid; gap: 2px; padding: 10px 12px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--garis); }
+.profile-head strong { font-size: 13px; }
+.profile-head small { font-size: 11px; color: var(--teks-sekunder); }
+
+/* Stok Keluar: panduan tiga langkah */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.steps li { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #fff; border: 1px solid var(--garis); border-radius: 12px; }
+.steps li > span { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--hijau-utama); color: #fff; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+.steps strong { display: block; font-size: 13px; }
+.steps small { font-size: 11px; color: var(--teks-sekunder); }
+
+/* Pemantauan: pemilih bulan */
+.field .label { font-size: 13px; font-weight: 600; }
+.month-picker { max-width: 320px; }
+.month-btn { width: 100%; cursor: pointer; font: inherit; color: var(--teks-utama); text-align: left; }
+.month-btn span { flex: 1; font-size: 14px; }
+.month-panel { min-width: 288px; padding: 12px; }
+.month-year { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px; }
+.month-year .icon-btn { margin: 0; }
+.month-year .flip { transform: rotate(180deg); }
+.month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.month-grid a { justify-content: center; padding: 12px 0; font-weight: 600; }
+.month-grid a.is-active { background: var(--hijau-utama); color: #fff; }
+
+/* ====================== TABLET (641–1024 px, desain 834 px) ====================== */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .topbar { padding: 16px 16px 0; }
+  .navbar { gap: 8px; padding: 12px 14px; }
+  .brand { width: auto; max-width: 150px; gap: 2px; }
+  .brand strong { font-size: 14px; line-height: 18px; }
+  .brand span { display: none; }
+  .menu { justify-content: flex-start; gap: 2px; }
+  .menu-link, .menu-group { padding: 10px; }
+  .gsearch { width: 40px; padding: 0 12px; transition: width .18s ease; }
+  .gsearch input { opacity: 0; width: 0; padding: 0; }
+  .gsearch:focus-within { width: 220px; }
+  .gsearch:focus-within input { opacity: 1; width: 100%; }
+  .who { display: none; }
+  .page { padding: 8px 16px 32px; }
+  .context-note span:last-child { display: none; }
+  .split, .form-layout { flex-direction: column; align-items: stretch; }
+  .split-side, .form-side { width: 100%; }
+  .table-wrap { overflow-x: auto; }
+  .table { min-width: 640px; }
+}
+
+/* ====================== MOBILE (≤ 640 px, desain 390 px) ====================== */
+@media (max-width: 640px) {
+  .steps { grid-template-columns: 1fr; gap: 8px; }
+  .steps li { padding: 12px 14px; }
+  .month-picker { max-width: none; }
+  .month-panel { left: 0; right: 0; min-width: 0; }
+}

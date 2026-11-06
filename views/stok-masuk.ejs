@@ -9,7 +9,7 @@
     <form class="form-main" method="post" action="/stok-masuk" novalidate data-stok-form="masuk">
       <input type="hidden" name="_csrf" value="<%= csrf %>">
       <% if (alert) { %>
-        <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+        <div class="alert err" style="width: 350.9px; max-width: 100%; margin: 0 auto 2px;" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
       <% } %>
 
       <div class="panel">
@@ -63,7 +63,7 @@
 
         <div class="field">
           <label for="catatan">Catatan (opsional)</label>
-          <div class="control"><input id="catatan" name="catatan" type="text" maxlength="200" value="<%= values.catatan || '' %>" placeholder="Mis. nomor surat jalan"></div>
+          <div class="control"><input id="catatan" name="catatan" type="text" maxlength="200" value="<%= values.catatan || '' %>" placeholder=""></div>
         </div>
       </div>
 

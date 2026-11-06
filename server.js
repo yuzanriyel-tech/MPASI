@@ -41,6 +41,7 @@ app.use((req, res, next) => {
 });
 
 app.use(require('./routes/auth'));
+app.use(require('./routes/pencarian'));
 app.use(require('./routes/dashboard'));
 app.use(require('./routes/stok'));
 app.use(require('./routes/master'));

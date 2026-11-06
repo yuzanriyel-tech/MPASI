@@ -46,10 +46,12 @@
       <% } %>
     </div>
 
-    <form class="gsearch" action="/" method="get" role="search">
-      <label class="sr-only" for="gsearch-q">Cari bahan</label>
+    <form class="gsearch" action="/" method="get" role="search" data-gsearch>
+      <label class="sr-only" for="gsearch-q">Cari bahan baku</label>
       <%- icon('search', 14) %>
-      <input id="gsearch-q" type="search" name="q" placeholder="Cari bahan atau transaksi…" value="<%= q %>">
+      <input id="gsearch-q" type="search" name="q" placeholder="Cari bahan baku…" value="<%= q %>" autocomplete="off"
+             role="combobox" aria-expanded="false" aria-controls="gsearch-list" data-gsearch-input>
+      <div class="gsearch-panel" id="gsearch-list" role="listbox" aria-label="Hasil pencarian bahan baku" hidden></div>
     </form>
 
     <div class="dropdown profile" data-dropdown>
@@ -59,6 +61,7 @@
         <%- icon('chevron-down', 16) %>
       </button>
       <div class="dropdown-panel right" hidden>
+        <div class="profile-head"><strong><%= user.nama %></strong><small><%= user.peran %> · @<%= user.username %></small></div>
         <form method="post" action="/logout">
           <input type="hidden" name="_csrf" value="<%= csrf %>">
           <button type="submit" class="dropdown-item"><%- icon('log-out', 16) %><span>Logout</span></button>

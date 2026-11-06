@@ -5,6 +5,7 @@ const { wajibLogin } = require('../lib/guard');
 
 const ERR_JUMLAH = 'Jumlah harus lebih dari 0. Tidak boleh kosong, 0, atau negatif.';
 const WAJIB = 'Data wajib diisi';
+const ALERT_GAGAL = { tipe: 'err', judul: 'Gagal menyimpan', isi: 'Data belum tersimpan dan saldo tidak berubah. Periksa isian lalu coba simpan lagi.' };
 const bahanJson = () => db.bahan().map((b) => ({
   kode: b.kode, nama: b.nama, saldo: b.saldo, minimum: b.minimum,
   satuanPakai: b.satuanPakai, satuanBeli: b.satuanBeli, isi: b.isi
@@ -47,11 +48,19 @@ router.post('/stok-masuk', wajibLogin, (req, res) => {
       alert: { tipe: 'err', judul: 'Periksa kolom yang ditandai', isi: 'Jumlah harus lebih dari 0. Kolom wajib tidak boleh kosong.' }
     });
   }
-  db.catat({
-    jenis: 'masuk', kode: b.kode, jumlahPakai: db.round(jumlah * b.isi), jumlahBeli: jumlah,
-    pemasok: v.pemasok, tanggalMasuk: v.tanggalMasuk, kedaluwarsa: v.kedaluwarsa, catatan: v.catatan,
-    oleh: res.locals.user.username, tanggal: todayISO()
-  });
+    try {
+    db.catat({
+      jenis: 'masuk', kode: b.kode, jumlahPakai: db.round(jumlah * b.isi), jumlahBeli: jumlah,
+      pemasok: v.pemasok, tanggalMasuk: v.tanggalMasuk, kedaluwarsa: v.kedaluwarsa, catatan: v.catatan,
+      oleh: res.locals.user.username, tanggal: todayISO()
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).render('stok-masuk', {
+      title: 'Stok Masuk', active: 'masuk', errors: {}, values: v, bahanData: bahanJson(),
+      pemasok: db.pemasok(), hariIni: todayISO(), alert: ALERT_GAGAL
+    });
+  }
   req.session.flash = { tipe: 'ok', judul: 'Data tersimpan', isi: 'Saldo bahan telah diperbarui.' };
   res.redirect('/');
 });
@@ -88,9 +97,21 @@ router.post('/stok-keluar', wajibLogin, (req, res) => {
         : { tipe: 'err', judul: 'Periksa kolom yang ditandai', isi: 'Jumlah harus lebih dari 0. Kolom wajib tidak boleh kosong.' }
     });
   }
-  db.catat({ jenis: 'keluar', kode: b.kode, jumlahPakai: jumlah, catatan: v.catatan, oleh: res.locals.user.username, tanggal: todayISO() });
-  req.session.flash = { tipe: 'ok', judul: 'Data tersimpan', isi: 'Saldo bahan telah diperbarui.' };
-  res.redirect('/');
+    try {
+    db.catat({ jenis: 'keluar', kode: b.kode, jumlahPakai: jumlah, catatan: v.catatan, oleh: res.locals.user.username, tanggal: todayISO() });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).render('stok-keluar', {
+      title: 'Stok Keluar', active: 'keluar', errors: {}, values: v, bahanData: bahanJson(), hariIni: todayISO(), alert: ALERT_GAGAL
+    });
+  }
+  req.session.flash = { 
+      tipe: 'ok', 
+      judul: 'Data tersimpan', 
+      isi: `Pemakaian ${b.nama} sebanyak ${jumlah.toString().replace('.', ',')} ${b.satuanPakai} berhasil dicatat.` 
+    };
+    res.redirect('/');
 });
+
 
 module.exports = router;

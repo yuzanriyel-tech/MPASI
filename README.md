@@ -47,6 +47,5 @@ views/, public/      tampilan (EJS, CSS, JS)
 
 ## Catatan
 
-- Data awal: `Master_Data_Bahan_Baku_Dummy.xlsx` (Nadila), satuan huruf kecil, stok awal BB-014 diubah menjadi 80 agar di bawah minimum. Stok awal menjadi satu batch pembuka per bahan; tanggalnya hari seed dijalankan (atur dengan `SEED_TANGGAL` di `.env`).
 - Server memakai zona waktu `Asia/Jakarta` agar tanggal "hari ini" benar walau di-host pada server UTC.
 - Untuk produksi: set `SESSION_SECRET`, gunakan HTTPS, store sesi persisten, ganti password akun demo.

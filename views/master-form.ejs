@@ -2,8 +2,12 @@
 <% const baru = mode === 'baru'; const action = baru ? '/master/baru' : `/master/${values.kode}/edit`; %>
 <section class="content">
   <div class="page-title">
-    <h1><%= baru ? 'Tambah bahan' : 'Edit bahan' %></h1>
-    <p>Satuan beli dipakai saat penerimaan; satuan pakai dipakai untuk saldo, pemakaian, dan minimum stok.</p>
+    <h1><%= baru ? 'Tambah bahan baku' : 'Edit bahan baku' %></h1>
+    <% if (baru) { %>
+      <p>Isi detail bahan baru untuk menambahkannya ke master data.</p>
+    <% } else { %>
+      <p><%= values.kode %> · Saldo saat ini: <%= f.angka(values.saldo) %> <%= values.satuanPakai %></p>
+    <% } %>
   </div>
 
   <form class="form-narrow" method="post" action="<%= action %>" novalidate>
@@ -13,61 +17,115 @@
     <% } %>
 
     <div class="panel">
-      <h2>Identitas bahan</h2>
-      <div class="field">
-        <label for="kode">Kode</label>
-        <div class="control readonly"><input id="kode" type="text" value="<%= values.kode %>" readonly></div>
-      </div>
+      <h2>Informasi bahan</h2>
+      <p class="hint" style="margin-top: -8px; margin-bottom: 16px;">Tanda * menunjukkan kolom wajib.</p>
+
       <div class="field <%= errors.nama ? 'has-error' : '' %>">
         <label for="nama">Nama bahan baku *</label>
-        <div class="control"><input id="nama" name="nama" type="text" value="<%= values.nama || '' %>" placeholder="Masukkan nama bahan"></div>
+        <div class="control"><input id="nama" name="nama" type="text" value="<%= values.nama || '' %>" placeholder="Mis. Biji Kopi Arabika"></div>
         <% if (errors.nama) { %><p class="err"><%= errors.nama %></p><% } %>
       </div>
+
       <div class="field <%= errors.kategori ? 'has-error' : '' %>">
         <label for="kategori">Kategori *</label>
-        <div class="control"><input id="kategori" name="kategori" type="text" list="daftar-kategori" value="<%= values.kategori || '' %>" placeholder="Mis. Kopi, Susu & Dairy, Sirup"></div>
-        <datalist id="daftar-kategori"><option value="Kopi"><option value="Susu &amp; Dairy"><option value="Sirup"></datalist>
+        <div class="control">
+          <select id="kategori" name="kategori">
+            <option value="" disabled <%= !values.kategori ? 'selected' : '' %>>Pilih kategori</option>
+            <% ['Kopi', 'Susu & Dairy', 'Sirup', 'Lainnya'].forEach(k => { %>
+              <option value="<%= k %>" <%= values.kategori === k ? 'selected' : '' %>><%= k %></option>
+            <% }) %>
+          </select>
+        </div>
         <% if (errors.kategori) { %><p class="err"><%= errors.kategori %></p><% } %>
       </div>
-    </div>
 
-    <div class="panel">
-      <h2>Satuan dan batas minimum</h2>
+      <div class="field <%= errors.pemasok ? 'has-error' : '' %>">
+        <label for="pemasok">Pemasok utama *</label>
+        <div class="control">
+          <select id="pemasok" name="pemasok">
+            <option value="" disabled <%= !values.pemasok ? 'selected' : '' %>>Pilih pemasok</option>
+            <% (daftarPemasok || []).forEach(p => { %>
+              <option value="<%= p %>" <%= values.pemasok === p ? 'selected' : '' %>><%= p %></option>
+            <% }) %>
+          </select>
+        </div>
+        <% if (errors.pemasok) { %><p class="err"><%= errors.pemasok %></p><% } %>
+      </div>
+
       <div class="grid-2">
         <div class="field <%= errors.satuanBeli ? 'has-error' : '' %>">
           <label for="satuanBeli">Satuan beli *</label>
-          <div class="control"><input id="satuanBeli" name="satuanBeli" type="text" value="<%= values.satuanBeli || '' %>" placeholder="karton, kantong, botol"></div>
+          <div class="control">
+            <select id="satuanBeli" name="satuanBeli">
+              <option value="" disabled <%= !values.satuanBeli ? 'selected' : '' %>>Pilih</option>
+              <% ['karton', 'kantong', 'botol', 'kg', 'liter', 'pcs'].forEach(s => { %>
+                <option value="<%= s %>" <%= values.satuanBeli === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </div>
           <% if (errors.satuanBeli) { %><p class="err"><%= errors.satuanBeli %></p><% } %>
         </div>
+
         <div class="field <%= errors.satuanPakai ? 'has-error' : '' %>">
           <label for="satuanPakai">Satuan pakai *</label>
-          <div class="control"><input id="satuanPakai" name="satuanPakai" type="text" value="<%= values.satuanPakai || '' %>" placeholder="kg, liter"></div>
+          <div class="control">
+            <select id="satuanPakai" name="satuanPakai">
+              <option value="" disabled <%= !values.satuanPakai ? 'selected' : '' %>>Pilih</option>
+              <% ['kg', 'liter', 'gram', 'ml', 'pcs'].forEach(s => { %>
+                <option value="<%= s %>" <%= values.satuanPakai === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </div>
           <% if (errors.satuanPakai) { %><p class="err"><%= errors.satuanPakai %></p><% } %>
         </div>
       </div>
+
       <div class="field <%= errors.isi ? 'has-error' : '' %>">
-        <label for="isi">Isi per satuan beli (dalam satuan pakai) *</label>
-        <div class="control"><input id="isi" name="isi" type="text" inputmode="decimal" value="<%= values.isi || '' %>" placeholder="Mis. 12"></div>
+        <label for="isi">Isi per satuan beli *</label>
+        <div class="control">
+          <input id="isi" name="isi" type="text" inputmode="decimal" value="<%= values.isi || '' %>" placeholder="1">
+          <span class="unit"><%= values.satuanPakai || 'pakai' %> / <%= values.satuanBeli || 'beli' %></span>
+        </div>
         <% if (errors.isi) { %><p class="err"><%= errors.isi %></p><% } %>
-        <p class="hint">Contoh: 1 karton Susu Cair = 12 liter.</p>
       </div>
+
       <div class="field <%= errors.minimum ? 'has-error' : '' %>">
         <label for="minimum">Minimum stok *</label>
-        <div class="control"><input id="minimum" name="minimum" type="text" inputmode="decimal" value="<%= values.minimum || '' %>" placeholder="0"><span class="unit"><%= values.satuanPakai || 'satuan pakai' %></span></div>
+        <div class="control">
+          <input id="minimum" name="minimum" type="text" inputmode="decimal" value="<%= values.minimum || '' %>" placeholder="0">
+          <span class="unit"><%= values.satuanPakai || 'satuan' %></span>
+        </div>
         <% if (errors.minimum) { %><p class="err"><%= errors.minimum %></p><% } %>
+        <% if (!baru) { %><p class="hint">Minimum sebelumnya: <%= f.angka(values.minimum) %> <%= values.satuanPakai %>.</p><% } %>
       </div>
-      <% if (baru) { %>
-      <div class="field <%= errors.saldo ? 'has-error' : '' %>">
-        <label for="saldo">Saldo awal</label>
-        <div class="control"><input id="saldo" name="saldo" type="text" inputmode="decimal" value="<%= values.saldo ?? '0' %>"></div>
-        <% if (errors.saldo) { %><p class="err"><%= errors.saldo %></p><% } %>
+
+      <div class="field <%= errors.masaSimpan ? 'has-error' : '' %>">
+        <label for="masaSimpan">Masa simpan *</label>
+        <div class="control">
+          <input id="masaSimpan" name="masaSimpan" type="text" inputmode="numeric" value="<%= values.masaSimpan || '' %>" placeholder="Mis. 180">
+          <span class="unit">hari</span>
+        </div>
+        <% if (errors.masaSimpan) { %><p class="err"><%= errors.masaSimpan %></p><% } %>
+        <p class="hint">Dihitung sejak tanggal masuk.</p>
       </div>
-      <% } else { %>
-      <p class="hint">Saldo saat ini <%= f.angka(values.saldo) %> <%= values.satuanPakai %> hanya berubah lewat Stok Masuk dan Stok Keluar.</p>
-      <% } %>
     </div>
 
+    <% if (!baru && values.saldo !== undefined) { %>
+    <div class="alert info" style="margin-bottom: 24px;">
+      <%- icon('info', 20) %>
+      <div>
+        <strong>Dampak perubahan minimum</strong>
+        <p>Saldo tetap <%= f.angka(values.saldo) %> <%= values.satuanPakai %>. Mengubah batas minimum dapat mempengaruhi status bahan di Dashboard.</p>
+      </div>
+    </div>
+    <% } %>
+
     <div class="actions">
+      <% if (!baru) { %>
+        <!-- Tombol hapus dengan pop-up konfirmasi -->
+        <button type="submit" formaction="/master/<%= values.kode %>/hapus" class="btn err outline" style="margin-right: auto;" onclick="return confirm('Yakin ingin menghapus <%= values.nama %>? Data yang dihapus tidak bisa dikembalikan.')">Hapus</button>
+      <% } %>
+      
       <a class="btn secondary" href="/master">Batal</a>
       <button type="submit" class="btn primary">Simpan</button>
     </div>

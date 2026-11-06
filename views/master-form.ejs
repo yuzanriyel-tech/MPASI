@@ -33,7 +33,7 @@
         <div class="control select">
           <select id="kategori" name="kategori">
             <option value="" disabled <%= !values.kategori ? 'selected' : '' %>>Pilih kategori</option>
-            <% ['Kopi', 'Susu & Dairy', 'Sirup', 'Lainnya'].forEach(k => { %>
+            <% daftarKategori.forEach(k => { %>
               <option value="<%= k %>" <%= values.kategori === k ? 'selected' : '' %>><%= k %></option>
             <% }) %>
           </select><%- icon('chevron-down', 18) %>
@@ -59,7 +59,7 @@
           <div class="control select">
             <select id="satuanBeli" name="satuanBeli">
               <option value="" disabled <%= !values.satuanBeli ? 'selected' : '' %>>Pilih</option>
-              <% ['karton', 'kantong', 'botol', 'kg', 'liter', 'pcs'].forEach(s => { %>
+              <% daftarSatuan.beli.forEach(s => { %>
                 <option value="<%= s %>" <%= values.satuanBeli === s ? 'selected' : '' %>><%= s %></option>
               <% }) %>
             </select><%- icon('chevron-down', 18) %>
@@ -72,7 +72,7 @@
           <div class="control select">
             <select id="satuanPakai" name="satuanPakai">
               <option value="" disabled <%= !values.satuanPakai ? 'selected' : '' %>>Pilih</option>
-              <% ['kg', 'liter', 'gram', 'ml', 'pcs'].forEach(s => { %>
+              <% daftarSatuan.pakai.forEach(s => { %>
                 <option value="<%= s %>" <%= values.satuanPakai === s ? 'selected' : '' %>><%= s %></option>
               <% }) %>
             </select><%- icon('chevron-down', 18) %>

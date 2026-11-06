@@ -1,7 +1,5 @@
 'use strict';
-// Membuat 7 tabel sesuai ERD: users, kategori, pemasok, bahan_baku, stok_masuk,
-// stok_keluar, detail_stok_keluar. Semua FK memakai ON DELETE RESTRICT supaya
-// riwayat transaksi tidak bisa hilang karena master data dihapus.
+// Buat 7 tabel ERD; FK pakai ON DELETE RESTRICT.
 
 const fk = (tabel, kolom, wajib = true) => ({
   type: 'INTEGER',
@@ -66,7 +64,7 @@ module.exports = {
       sisa_stok: desimal(),
       tanggal_kedaluwarsa: { type: T.DATEONLY, allowNull: true }
     }, opsi);
-    // Dipakai FEFO: batch dengan sisa > 0 per bahan, urut kedaluwarsa
+    // Index untuk query FEFO
     await qi.addIndex('stok_masuk', ['id_bahan', 'tanggal_kedaluwarsa'], { name: 'idx_stok_masuk_fefo' });
 
     await qi.createTable('stok_keluar', {

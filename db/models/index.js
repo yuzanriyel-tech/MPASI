@@ -1,5 +1,4 @@
-// Model Sequelize untuk 7 tabel sesuai ERD (Lampiran D.6 dan D.7 laporan).
-// Nama tabel dan kolom sengaja sama persis dengan kamus data.
+// 7 model Sequelize sesuai ERD.
 const { Sequelize, DataTypes: T } = require('sequelize');
 const config = require('../../config/config')[process.env.NODE_ENV || 'development'];
 
@@ -74,7 +73,7 @@ const DetailStokKeluar = sequelize.define('DetailStokKeluar', {
   jumlah_diambil: desimal()
 }, { tableName: 'detail_stok_keluar', timestamps: false });
 
-// Relasi (Tabel D.16)
+// Relasi antar model
 BahanBaku.belongsTo(Kategori, { foreignKey: 'id_kategori', as: 'kategori' });
 BahanBaku.belongsTo(Pemasok, { foreignKey: 'id_pemasok', as: 'pemasok' });
 StokMasuk.belongsTo(BahanBaku, { foreignKey: 'id_bahan', as: 'bahan' });

@@ -1,3 +1,6 @@
+process.env.TZ = process.env.TZ || 'Asia/Jakarta'; // Timezone WIB
+require('dotenv').config();
+require('express-async-errors'); // Error async ke error handler
 const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
@@ -21,13 +24,13 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax', maxAge: 8 * 60 * 60 * 1000 }
 }));
 
-// Variabel & helper yang tersedia di semua view + perlindungan CSRF
-app.use((req, res, next) => {
+// Injeksi locals & proteksi CSRF
+app.use(async (req, res, next) => {
   if (!req.session.csrf) req.session.csrf = crypto.randomBytes(24).toString('hex');
   if (req.method === 'POST' && req.body._csrf !== req.session.csrf) {
     return res.status(403).render('error', { title: 'Sesi tidak valid', pesan: 'Sesi formulir tidak valid atau sudah kedaluwarsa. Muat ulang halaman lalu coba lagi.', user: null, active: '' });
   }
-  const u = req.session.username ? db.user(req.session.username) : null;
+  const u = req.session.username ? await db.user(req.session.username) : null;
   res.locals.user = u && u.aktif ? u : null;
   res.locals.csrf = req.session.csrf;
   res.locals.flash = req.session.flash || null;

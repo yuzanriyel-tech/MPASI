@@ -6,7 +6,7 @@ router.get('/login', (req, res) => {
   res.render('login', { title: 'Login', error: null, values: {} });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
   const errors = {};
@@ -15,7 +15,7 @@ router.post('/login', (req, res) => {
   if (Object.keys(errors).length) {
     return res.status(400).render('login', { title: 'Login', error: null, errors, values: { username } });
   }
-  const u = db.user(username);
+  const u = await db.user(username);
   if (!u || !u.aktif || !db.verifyPassword(password, u.password)) {
     return res.status(401).render('login', {
       title: 'Login',

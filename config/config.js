@@ -1,5 +1,4 @@
-// Konfigurasi koneksi database (dipakai aplikasi dan sequelize-cli).
-// Nilai diambil dari .env, lihat .env.example.
+// Konfigurasi DB dari .env.
 require('dotenv').config();
 
 const base = {
@@ -11,7 +10,7 @@ const base = {
   dialect: 'mysql',
   timezone: '+07:00',
   logging: false,
-  // Sebagian hosting MySQL mewajibkan SSL: set DB_SSL=true
+  // Set DB_SSL=true jika hosting mewajibkan SSL
   dialectOptions: process.env.DB_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {}
 };
 

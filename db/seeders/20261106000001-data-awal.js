@@ -1,12 +1,6 @@
 'use strict';
-// Data awal: 2 akun, kategori, pemasok, 15 bahan baku (Master_Data_Bahan_Baku_Dummy.xlsx dari Nadila)
-// dan satu batch pembuka per bahan di stok_masuk supaya saldo awal punya batch untuk FEFO.
-//
-// Perubahan dari Excel: satuan ditulis huruf kecil, dan stok awal BB-014 diubah 150 -> 80 supaya
-// benar-benar di bawah minimum (100) dan alert-nya muncul saat UAT.
-//
-// Tanggal batch pembuka = hari seed dijalankan (atau SEED_TANGGAL=YYYY-MM-DD di .env);
-// kedaluwarsa = tanggal itu + masa simpan. Jalankan ulang seed menjelang UAT agar tanggalnya segar.
+// Data awal: 2 akun, kategori, pemasok, 15 bahan baku.
+// Tanggal batch = hari seed atau SEED_TANGGAL di .env.
 const { hashPassword } = require('../../lib/password');
 
 const AKUN = [
@@ -16,7 +10,7 @@ const AKUN = [
 const KATEGORI = ['Kopi', 'Susu & Dairy', 'Sirup', 'Bubuk', 'Pemanis', 'Pendukung', 'Kemasan', 'Lainnya'];
 const PEMASOK = ['Pemasok Pusat', 'CV Sumber Pangan', 'Toko Grosir Maju', 'Toko Es Segar'];
 
-// [kode, nama, kategori, satuan beli, satuan pakai, isi per satuan beli, stok awal, stok minimum, pemasok, masa simpan (hari)]
+// [kode, nama, kat, satBeli, satPakai, isi, stok, min, pemasok, masa]
 const BAHAN = [
   ['BB-001', 'Biji Kopi House Blend', 'Kopi', 'kg', 'gram', 1000, 4500, 2000, 'Pemasok Pusat', 180],
   ['BB-002', 'Biji Kopi Arabika Single Origin', 'Kopi', 'kg', 'gram', 1000, 1800, 1000, 'Pemasok Pusat', 180],
@@ -71,7 +65,7 @@ module.exports = {
   },
 
   async down(qi) {
-    // urutan dibalik supaya tidak melanggar FK
+    // Urutan terbalik agar tidak langgar FK
     for (const t of ['detail_stok_keluar', 'stok_keluar', 'stok_masuk', 'bahan_baku', 'pemasok', 'kategori', 'users']) {
       await qi.bulkDelete(t, null, {});
     }

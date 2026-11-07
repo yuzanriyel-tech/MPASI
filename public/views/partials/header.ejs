@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Cafe Radjo Roastery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<% const pengelola = user && user.peran === 'Pengelola';
+   const grupKelola = ['master','pemantauan','laporan','akun'].includes(active);
+   const menuKelola = [
+     { href: '/master', key: 'master', label: 'Master Bahan Baku', icon: 'package' },
+     { href: '/pemantauan', key: 'pemantauan', label: 'Pemantauan Stok Minimum Bulanan', icon: 'calendar-days' },
+     { href: '/laporan', key: 'laporan', label: 'Laporan & Riwayat Transaksi', icon: 'clipboard-list' },
+     { href: '/akun', key: 'akun', label: 'Akun Pengguna', icon: 'users' }
+   ]; %>
+<a class="skip" href="#konten">Lewati ke konten</a>
+
+<!-- ===== Navbar desktop ===== -->
+<header class="topbar">
+  <nav class="navbar" aria-label="Navigasi utama">
+    <div class="brand">
+      <strong>Cafe Radjo Roastery</strong>
+      <span>Sistem Informasi Persediaan</span>
+    </div>
+
+    <div class="menu">
+      <a class="menu-link <%= active==='dashboard' ? 'is-active' : '' %>" href="/"><%- icon('layout-dashboard', 16) %><span>Dashboard</span></a>
+      <a class="menu-link <%= active==='masuk' ? 'is-active' : '' %>" href="/stok-masuk"><%- icon('arrow-down-to-line', 16) %><span>Stok Masuk</span></a>
+      <a class="menu-link <%= active==='keluar' ? 'is-active' : '' %>" href="/stok-keluar"><%- icon('arrow-up-from-line', 16) %><span>Stok Keluar</span></a>
+      <% if (pengelola) { %>
+      <div class="dropdown" data-dropdown>
+        <button type="button" class="menu-group <%= grupKelola ? 'is-active' : '' %>" aria-haspopup="true" aria-expanded="false" data-dropdown-toggle>
+          <span>Pengelolaan</span><%- icon('chevron-down', 16) %>
+        </button>
+        <div class="dropdown-panel" hidden>
+          <% menuKelola.forEach(m => { %>
+            <a class="<%= active===m.key ? 'is-active' : '' %>" href="<%= m.href %>"><%- icon(m.icon, 16) %><span><%= m.label %></span></a>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <form class="gsearch" action="/" method="get" role="search" data-gsearch>
+      <label class="sr-only" for="gsearch-q">Cari bahan baku</label>
+      <%- icon('search', 14) %>
+      <input id="gsearch-q" type="search" name="q" placeholder="Cari bahan baku…" value="<%= q %>" autocomplete="off"
+             role="combobox" aria-expanded="false" aria-controls="gsearch-list" data-gsearch-input>
+      <div class="gsearch-panel" id="gsearch-list" role="listbox" aria-label="Hasil pencarian bahan baku" hidden></div>
+    </form>
+
+    <div class="dropdown profile" data-dropdown>
+      <button type="button" class="profile-btn" aria-haspopup="true" aria-expanded="false" data-dropdown-toggle>
+        <span class="avatar"><%= user.nama.charAt(0).toUpperCase() %></span>
+        <span class="who"><strong><%= user.nama %></strong><small><%= user.peran %></small></span>
+        <%- icon('chevron-down', 16) %>
+      </button>
+      <div class="dropdown-panel right" hidden>
+        <div class="profile-head"><strong><%= user.nama %></strong><small><%= user.peran %> · @<%= user.username %></small></div>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button type="submit" class="dropdown-item"><%- icon('log-out', 16) %><span>Logout</span></button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ===== Header mobile ===== -->
+<header class="m-header">
+  <div class="m-bar">
+    <% if (pengelola) { %>
+    <button type="button" class="m-menu-btn" aria-label="Buka menu pengelola" aria-expanded="false" aria-controls="m-menu" data-mmenu-toggle><%- icon('menu', 20) %></button>
+    <% } %>
+    <div class="m-brand"><strong>Cafe Radjo Roastery</strong><small><%= user.peran %></small></div>
+    <div class="dropdown" data-dropdown>
+      <button type="button" class="m-profile" aria-haspopup="true" aria-expanded="false" data-dropdown-toggle>
+        <strong><%= user.nama %></strong><%- icon('chevron-down', 16) %>
+      </button>
+      <div class="dropdown-panel right" hidden>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button type="submit" class="dropdown-item"><%- icon('log-out', 16) %><span>Logout</span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <% if (pengelola) { %>
+  <nav class="m-menu" id="m-menu" aria-label="Menu pengelola" hidden>
+    <p class="eyebrow">MENU PENGELOLA</p>
+    <% menuKelola.forEach(m => { %>
+      <a class="m-menu-item <%= active===m.key ? 'is-active' : '' %>" href="<%= m.href %>"><span><%= m.label %></span><%- icon('chevron-right', 18) %></a>
+    <% }) %>
+  </nav>
+  <% } %>
+</header>
+
+<main id="konten" class="page">
+  <% if (flash) { %>
+    <div class="alert <%= flash.tipe === 'ok' ? 'ok' : 'err' %>" role="status">
+      <%- icon(flash.tipe === 'ok' ? 'circle-check' : 'circle-alert', 20) %>
+      <div><strong><%= flash.judul %></strong><p><%= flash.isi %></p></div>
+    </div>
+  <% } %>
+  <div class="context">
+    <div><strong>Ruang kerja <%= user.peran %></strong><small><%= f.bulanID(f.todayISO().slice(0,7)) %> · Operasional cafe</small></div>
+    <div class="context-note"><span><%= f.bulanID(f.todayISO().slice(0,7)) %></span><span>Saldo tercatat, kerja tertata.</span></div>
+  </div>

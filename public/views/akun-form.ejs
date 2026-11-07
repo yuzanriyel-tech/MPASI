@@ -1,0 +1,47 @@
+<%- include('partials/header', { title, active }) %>
+<% const baru = mode === 'baru'; const action = baru ? '/akun/baru' : `/akun/${values.username}/edit`; %>
+<section class="content">
+  <div class="page-title">
+    <h1><%= baru ? 'Tambah akun' : 'Edit akun' %></h1>
+    <p><%= baru ? 'Buat akun baru untuk Karyawan atau Pengelola.' : 'Ubah nama, peran, atau atur ulang password.' %></p>
+  </div>
+
+  <form class="form-narrow" method="post" action="<%= action %>" novalidate autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <% if (alert) { %>
+      <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+    <% } %>
+    <div class="panel">
+      <h2>Data akun</h2>
+      <div class="field <%= errors.nama ? 'has-error' : '' %>">
+        <label for="nama">Nama *</label>
+        <div class="control"><input id="nama" name="nama" type="text" value="<%= values.nama || '' %>" placeholder="Nama lengkap"></div>
+        <% if (errors.nama) { %><p class="err"><%= errors.nama %></p><% } %>
+      </div>
+      <div class="field <%= errors.username ? 'has-error' : '' %>">
+        <label for="username">Username *</label>
+        <div class="control <%= baru ? '' : 'readonly' %>"><input id="username" name="username" type="text" value="<%= values.username || '' %>" <%= baru ? '' : 'readonly' %> placeholder="huruf kecil, tanpa spasi"></div>
+        <% if (errors.username) { %><p class="err"><%= errors.username %></p><% } %>
+      </div>
+      <div class="field <%= errors.peran ? 'has-error' : '' %>">
+        <label for="peran">Peran *</label>
+        <div class="control select"><select id="peran" name="peran">
+          <% ['Karyawan','Pengelola'].forEach(p => { %><option value="<%= p %>" <%= values.peran === p ? 'selected' : '' %>><%= p %></option><% }) %>
+        </select><%- icon('chevron-down', 18) %></div>
+        <% if (errors.peran) { %><p class="err"><%= errors.peran %></p><% } %>
+      </div>
+      <div class="field <%= errors.password ? 'has-error' : '' %>">
+        <label for="password"><%= baru ? 'Password *' : 'Password baru (opsional)' %></label>
+        <div class="control"><input id="password" name="password" type="password" autocomplete="new-password" placeholder="Minimal 6 karakter"><button type="button" class="icon-btn" aria-label="Tampilkan password" aria-pressed="false"
+          data-toggle-password="#password"
+          data-icon-show='<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>'><%- icon('eye-off', 18) %></button>
+        <% if (errors.password) { %><p class="err"><%= errors.password %></p><% } %>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn secondary" href="/akun">Batal</a>
+      <button type="submit" class="btn primary">Simpan</button>
+    </div>
+  </form>
+</section>
+<%- include('partials/footer') %>

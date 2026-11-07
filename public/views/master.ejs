@@ -1,0 +1,51 @@
+<%- include('partials/header', { title, active }) %>
+<section class="content">
+  <div class="page-title">
+    <h1>Master Bahan Baku</h1>
+    <p>Atur bahan, satuan, pemasok, dan batas minimum stok.</p>
+  </div>
+
+  <form class="toolbar" method="get" action="/master">
+    <% if (kategoriAktif) { %><input type="hidden" name="kategori" value="<%= kategoriAktif %>"><% } %>
+    <div class="field grow">
+      <label for="cari">Cari bahan</label>
+      <div class="control"><%- icon('search', 17) %><input id="cari" name="q" type="search" placeholder="Kode atau nama bahan" value="<%= cari %>"></div>
+    </div>
+    <button class="btn secondary" type="submit">Cari</button>
+    <a class="btn primary" href="/master/baru">Tambah bahan</a>
+  </form>
+
+  <div class="segmented" role="group" aria-label="Filter kategori">
+    <a class="<%= !kategoriAktif ? 'is-active' : '' %>" href="/master<%= cari ? '?q=' + encodeURIComponent(cari) : '' %>">Semua kategori</a>
+    <% kategori.forEach(k => { %>
+      <a class="<%= kategoriAktif === k ? 'is-active' : '' %>" href="/master?kategori=<%= encodeURIComponent(k) %><%= cari ? '&q=' + encodeURIComponent(cari) : '' %>"><%= k %></a>
+    <% }) %>
+  </div>
+
+  <% if (!daftar.length) { %>
+    <div class="empty"><%- icon('inbox', 32) %><h3>Data tidak ditemukan</h3><p>Ubah kata kunci atau filter kategori.</p></div>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Kode</th><th>Nama bahan</th><th>Kategori</th><th>Satuan beli</th><th>Satuan pakai</th><th>Saldo</th><th>Minimum</th><th>Status</th><th>Aksi</th></tr></thead>
+      <tbody>
+      <% daftar.forEach(b => { %>
+        <tr>
+          <td data-label="Kode"><strong><%= b.kode %></strong></td>
+          <td data-label="Nama bahan"><%= b.nama %></td>
+          <td data-label="Kategori"><%= b.kategori %></td>
+          <td data-label="Satuan beli"><%= b.satuanBeli %> · <%= f.angka(b.isi) %> <%= b.satuanPakai %></td>
+          <td data-label="Satuan pakai"><%= b.satuanPakai %></td>
+          <td data-label="Saldo"><%= f.angka(b.saldo) %> <%= b.satuanPakai %></td>
+          <td data-label="Minimum"><%= f.angka(b.minimum) %> <%= b.satuanPakai %></td>
+          <td data-label="Status"><%- include('partials/status', { b }) %></td>
+          <td data-label="Aksi"><a class="btn secondary" href="/master/<%= b.kode %>/edit">Edit</a></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+  <p class="footnote"><%= daftar.length %> bahan ditampilkan · Saldo dan minimum menggunakan satuan pakai.</p>
+</section>
+<%- include('partials/footer') %>

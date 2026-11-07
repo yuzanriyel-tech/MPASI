@@ -1,0 +1,137 @@
+<%- include('partials/header', { title, active }) %>
+<% const baru = mode === 'baru'; const action = baru ? '/master/baru' : `/master/${values.kode}/edit`; %>
+<section class="content">
+  <div class="page-title">
+    <h1><%= baru ? 'Tambah bahan baku' : 'Edit bahan baku' %></h1>
+    <% if (baru) { %>
+      <p>Isi detail bahan baru untuk menambahkannya ke master data.</p>
+    <% } else { %>
+      <p><%= values.kode %> · Saldo saat ini: <%= f.angka(values.saldo) %> <%= values.satuanPakai %></p>
+    <% } %>
+  </div>
+
+  <form class="form-wide" method="post" action="<%= action %>" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <% if (alert) { %>
+      <div class="alert err" role="alert"><%- icon('circle-alert', 20) %><div><strong><%= alert.judul %></strong><p><%= alert.isi %></p></div></div>
+    <% } %>
+
+    <div class="panel">
+      <h2>Informasi bahan</h2>
+      <p class="hint" style="margin-top: -8px; margin-bottom: 16px;">Tanda * menunjukkan kolom wajib.</p>
+      
+      <div class="form-grid">
+
+      <div class="field <%= errors.nama ? 'has-error' : '' %>">
+        <label for="nama">Nama bahan baku *</label>
+        <div class="control"><input id="nama" name="nama" type="text" value="<%= values.nama || '' %>" placeholder="Mis. Biji Kopi Arabika"></div>
+        <% if (errors.nama) { %><p class="err"><%= errors.nama %></p><% } %>
+      </div>
+
+      <div class="field <%= errors.kategori ? 'has-error' : '' %>">
+        <label for="kategori">Kategori *</label>
+        <div class="control select">
+          <select id="kategori" name="kategori">
+            <option value="" disabled <%= !values.kategori ? 'selected' : '' %>>Pilih kategori</option>
+            <% daftarKategori.forEach(k => { %>
+              <option value="<%= k %>" <%= values.kategori === k ? 'selected' : '' %>><%= k %></option>
+            <% }) %>
+          </select><%- icon('chevron-down', 18) %>
+        </div>
+        <% if (errors.kategori) { %><p class="err"><%= errors.kategori %></p><% } %>
+      </div>
+
+      <div class="field <%= errors.pemasok ? 'has-error' : '' %>">
+        <label for="pemasok">Pemasok utama *</label>
+        <div class="control select">
+          <select id="pemasok" name="pemasok">
+            <option value="" disabled <%= !values.pemasok ? 'selected' : '' %>>Pilih pemasok</option>
+            <% (daftarPemasok || []).forEach(p => { %>
+              <option value="<%= p %>" <%= values.pemasok === p ? 'selected' : '' %>><%= p %></option>
+            <% }) %>
+          </select><%- icon('chevron-down', 18) %>
+        </div>
+        <% if (errors.pemasok) { %><p class="err"><%= errors.pemasok %></p><% } %>
+      </div>
+
+        <div class="field <%= errors.satuanBeli ? 'has-error' : '' %>">
+          <label for="satuanBeli">Satuan beli *</label>
+          <div class="control select">
+            <select id="satuanBeli" name="satuanBeli">
+              <option value="" disabled <%= !values.satuanBeli ? 'selected' : '' %>>Pilih</option>
+              <% daftarSatuan.beli.forEach(s => { %>
+                <option value="<%= s %>" <%= values.satuanBeli === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select><%- icon('chevron-down', 18) %>
+          </div>
+          <% if (errors.satuanBeli) { %><p class="err"><%= errors.satuanBeli %></p><% } %>
+        </div>
+
+        <div class="field <%= errors.satuanPakai ? 'has-error' : '' %>">
+          <label for="satuanPakai">Satuan pakai *</label>
+          <div class="control select">
+            <select id="satuanPakai" name="satuanPakai">
+              <option value="" disabled <%= !values.satuanPakai ? 'selected' : '' %>>Pilih</option>
+              <% daftarSatuan.pakai.forEach(s => { %>
+                <option value="<%= s %>" <%= values.satuanPakai === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select><%- icon('chevron-down', 18) %>
+          </div>
+          <% if (errors.satuanPakai) { %><p class="err"><%= errors.satuanPakai %></p><% } %>
+        </div>
+
+      <div class="field <%= errors.isi ? 'has-error' : '' %>">
+        <label for="isi">Isi per satuan beli *</label>
+        <div class="control">
+          <input id="isi" name="isi" type="text" inputmode="decimal" value="<%= values.isi || '' %>" placeholder="1">
+          <span class="unit"><%= values.satuanPakai || 'pakai' %> / <%= values.satuanBeli || 'beli' %></span>
+        </div>
+        <% if (errors.isi) { %><p class="err"><%= errors.isi %></p>
+        <% } else if (values.isi && values.satuanBeli && values.satuanPakai) { %>
+          <p class="hint">1 <%= values.satuanBeli %> = <%= values.isi %> <%= values.satuanPakai %></p>
+        <% } %>
+      </div>
+
+      <div class="field <%= errors.minimum ? 'has-error' : '' %>">
+        <label for="minimum">Minimum stok *</label>
+        <div class="control">
+          <input id="minimum" name="minimum" type="text" inputmode="decimal" value="<%= values.minimum || '' %>" placeholder="0">
+          <span class="unit"><%= values.satuanPakai || 'satuan' %></span>
+        </div>
+        <% if (errors.minimum) { %><p class="err"><%= errors.minimum %></p><% } %>
+        <% if (!baru) { %><p class="hint">Minimum sebelumnya: <%= f.angka(values.minimum) %> <%= values.satuanPakai %>.</p><% } %>
+      </div>
+
+      <div class="field <%= errors.masaSimpan ? 'has-error' : '' %>">
+        <label for="masaSimpan">Masa simpan *</label>
+        <div class="control">
+          <input id="masaSimpan" name="masaSimpan" type="text" inputmode="numeric" value="<%= values.masaSimpan || '' %>" placeholder="Mis. 180">
+          <span class="unit">hari</span>
+        </div>
+        <% if (errors.masaSimpan) { %><p class="err"><%= errors.masaSimpan %></p><% } %>
+        <p class="hint">Dihitung sejak tanggal masuk.</p>
+      </div>
+      </div>
+    </div>
+
+    <% if (!baru && values.saldo !== undefined) { %>
+    <div class="alert info">
+      <%- icon('info', 20) %>
+      <div>
+        <strong>Dampak perubahan minimum</strong>
+        <p>Saldo tetap <%= f.angka(values.saldo) %> <%= values.satuanPakai %>. Mengubah batas minimum dapat mempengaruhi status bahan di Dashboard.</p>
+      </div>
+    </div>
+    <% } %>
+
+    <div class="actions form-actions">
+      <a class="btn secondary" href="/master">Batal</a>
+      <button type="submit" class="btn primary">Simpan</button>
+      <% if (!baru) { %>
+        <!-- Tombol hapus dengan pop-up konfirmasi -->
+        <button type="submit" formaction="/master/<%= values.kode %>/hapus" class="btn danger-outline btn-hapus" onclick="return confirm('Yakin ingin menghapus <%= values.nama %>? Data yang dihapus tidak bisa dikembalikan.')">Hapus</button>
+      <% } %>
+    </div>
+  </form>
+</section>
+<%- include('partials/footer') %>

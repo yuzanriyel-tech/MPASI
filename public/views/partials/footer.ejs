@@ -1,0 +1,11 @@
+</main>
+
+<!-- ===== Navigasi bawah (mobile) ===== -->
+<nav class="bottom-nav" aria-label="Navigasi bawah">
+  <a class="<%= active==='dashboard' ? 'is-active' : '' %>" href="/"><%- icon('layout-dashboard', 20) %><span>Dashboard</span></a>
+  <a class="<%= active==='masuk' ? 'is-active' : '' %>" href="/stok-masuk"><%- icon('arrow-down-to-line', 20) %><span>Masuk</span></a>
+  <a class="<%= active==='keluar' ? 'is-active' : '' %>" href="/stok-keluar"><%- icon('arrow-up-from-line', 20) %><span>Keluar</span></a>
+</nav>
+<script src="/js/app.js" defer></script>
+</body>
+</html>

@@ -60,11 +60,6 @@
           <div class="control date"><input id="kedaluwarsa" name="kedaluwarsa" type="date" value="<%= values.kedaluwarsa || '' %>"><%- icon('calendar-days', 18) %></div>
           <% if (errors.kedaluwarsa) { %><p class="err"><%= errors.kedaluwarsa %></p><% } %>
         </div>
-
-        <div class="field">
-          <label for="catatan">Catatan (opsional)</label>
-          <div class="control"><input id="catatan" name="catatan" type="text" maxlength="200" value="<%= values.catatan || '' %>" placeholder=""></div>
-        </div>
       </div>
 
       <div class="actions">
